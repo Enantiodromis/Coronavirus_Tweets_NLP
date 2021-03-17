@@ -1,7 +1,7 @@
 # IMPORTS
 import numpy as np
 import pandas as pd
-import re
+
 
 # Reading in the text_data csv file as a df (vectorised)
 df = pd.read_csv('data/text_data/Corona_NLP_train.csv')
@@ -25,3 +25,22 @@ df = pd.DataFrame(df['OriginalTweet'].str.lower())
 
 # Replace non-alphabetic characters with whitespaces and ensure that the words of a message are seperated by a single whitespace
 df['OriginalTweet'] = df['OriginalTweet'].replace(to_replace = '[^a-z]+', value = ' ', regex = True).replace(to_replace = '[\s\s]+', value = ' ', regex = True)
+
+# 1.2
+# Tokenize the tweets (i.e. convert each into a list of words)
+df['OriginalTweet_tokenized'] = df.apply(lambda row: row['OriginalTweet'].split(" "), axis = 1)
+print(df['OriginalTweet_tokenized'])
+# Counting the total number of all words (including repetitions)
+df['len_tokens'] = df['OriginalTweet_tokenized'].apply(lambda x: len(x))
+sum_of_len_tokens = df['len_tokens'].sum()
+print("Total number of all words (including repetitions): " + str(sum_of_len_tokens))
+
+# Counting the number of distinct words
+df['unique_tokens'] = df['OriginalTweet_tokenized'].apply(lambda x: set(x))
+df['len_tokens_unique'] = df['unique_tokens'].apply(lambda x: len((x)))
+sum_of_len_tokens_unique = df['len_tokens_unique'].sum()
+print("Total number of unique words: " + str(sum_of_len_tokens_unique))
+
+# The 10 most frequent words in the corpus
+
+# Remove stop words, words with ≤ 2 characters and recalculate the number of all words (including repetitions) and the 10 most frequent words in the modified corpus.
