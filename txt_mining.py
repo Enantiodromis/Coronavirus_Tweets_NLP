@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset, InsetPosition
 
 
 # Reading in the text_data csv file as a df (vectorised)
@@ -58,26 +59,26 @@ print(token_count.head(10))
 # 1.3
 # Plot a histogram with word frequencies, where the horizontal axis corresponds to words, while the vertical axis indicates the fraction of documents in a which a word appears. 
 # The words should be sorted in increasing order of their frequencies. Use a line chart for this, instead of a histogram.
-words = set(df.OriginalTweet.str.split(expand = True).stack())
 document = df.OriginalTweet.tolist()
 #print(document)
 vectorizer =  CountVectorizer() # Creating a vectorizer object
 vectorizer.fit(document)
-# Printing the identified Unique words along with their indices 
-#print("Vocabulary: ", vectorizer.vocabulary_) 
-  
+
 # Encode the Document 
 vector = vectorizer.transform(document) 
   
 # Summarizing the Encoded Texts 
-print("Encoded Document is:") 
-vector_summed = sorted(sum(vector.toarray()).tolist())
-print(len(vector_summed))
+vector_summed = sum(vector.toarray() > 0).tolist()
+words_and_sums = sorted(zip(vector_summed, vectorizer.get_feature_names()), key= lambda x : x[0])
 
-y = range(1, len(vector_summed)+1)
+ordered_words = [x[1] for x in words_and_sums]
+ordered_frequencies = [x[0]/len(df.OriginalTweet) for x in words_and_sums]
 
-plt.plot(y,vector_summed)
-plt.title('Word frequency')
-plt.xlabel('WORDS')
-plt.ylabel('FREQUENCY')
+plt.figure(figsize=(10,6))
+plt.plot(ordered_words,ordered_frequencies)
+plt.xticks([])   
+
+plt.title('Word Frequencies')
+plt.xlabel('Words')
+plt.ylabel('Frequencies (Fraction of documents in a which the word appears)')
 plt.show()
