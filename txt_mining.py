@@ -5,7 +5,9 @@ from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset, InsetPosition
-
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
 
 # Reading in the text_data csv file as a df (vectorised)
 df = pd.read_csv('data/text_data/Corona_NLP_train.csv')
@@ -25,14 +27,14 @@ max_ep_tweets_date_list = max_ep_tweets_date.groupby('TweetAt')['Sentiment'].val
 print("Date of the max amount of extremely positive: " + max_ep_tweets_date_list['TweetAt'].iloc[0])
 
 # Converting the messages to lower case replace non-alphabetic characters with whitespaces and ensure that the words of a message are seperated by a single whitespace
-df.OriginalTweet = df.OriginalTweet.str.lower()\
+df['OriginalTweet_modified'] = df.OriginalTweet.str.lower()\
                                          .replace(to_replace = '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})+', value = '', regex = True)\
                                          .replace(to_replace = '[^a-z]+', value = ' ', regex = True)\
                                          .replace(to_replace = '[\s\s]+', value = ' ', regex = True)\
 
 # 1.2
 # Tokenize the tweets (i.e. convert each into a list of words) frequency of every word in the corpus
-token_count = df.OriginalTweet.str.split(expand = True).stack().value_counts()
+token_count = df.OriginalTweet_modified.str.split(expand = True).stack().value_counts()
 
 # Counting the total number of all words (including repetitions) and distinct words:
 def word_count(input_series):
@@ -46,10 +48,10 @@ print("Number of distinct words: %s" %distinct_words)
 print(token_count.head(10))
 
 # Remove stop words, words with ≤ 2 characters and recalculate the number of all words (including repetitions) and the 10 most frequent words in the modified corpus.
-df.OriginalTweet = df.OriginalTweet.apply(lambda x: [item for item in x.split() if item not in ENGLISH_STOP_WORDS and len(item) > 2]).apply(lambda x: ' '.join(x))
+df.OriginalTweet_modified = df.OriginalTweet_modified.apply(lambda x: [item for item in x.split() if item not in ENGLISH_STOP_WORDS and len(item) > 2]).apply(lambda x: ' '.join(x))
 
 # Frequency of every word in the corpus
-token_count = df.OriginalTweet.str.split(expand = True).stack().value_counts()
+token_count = df.OriginalTweet_modified.str.split(expand = True).stack().value_counts()
 all_words, distinct_words = word_count(token_count)
 
 # Counting the total number of all words (including repetitions)
@@ -59,13 +61,10 @@ print(token_count.head(10))
 # 1.3
 # Plot a histogram with word frequencies, where the horizontal axis corresponds to words, while the vertical axis indicates the fraction of documents in a which a word appears. 
 # The words should be sorted in increasing order of their frequencies. Use a line chart for this, instead of a histogram.
-document = df.OriginalTweet.tolist()
-#print(document)
-vectorizer =  CountVectorizer() # Creating a vectorizer object
-vectorizer.fit(document)
+document = df.OriginalTweet_modified.tolist()
 
-# Encode the Document 
-vector = vectorizer.transform(document) 
+vectorizer =  CountVectorizer() # Creating a vectorizer object
+vector = vectorizer.fit_transform(document) 
   
 # Summarizing the Encoded Texts 
 vector_summed = sum(vector.toarray() > 0).tolist()
@@ -81,4 +80,28 @@ plt.xticks([])
 plt.title('Word Frequencies')
 plt.xlabel('Words')
 plt.ylabel('Frequencies (Fraction of documents in a which the word appears)')
-plt.show()
+plt.savefig('word_frequency.png')
+
+# 1.4
+# This task can be done individually from the previous three. 
+# Produce a Multinomial Naive Bayes classiﬁer for the Coronavirus Tweets NLP data set using scikit-learn. 
+# For this, store the corpus in a numpy array, produce a sparse representation of the term-document matrix with a CountVectorizer and build the model using this term-document matrix. 
+# What is the error rate of the classiﬁer? 
+# You may want to check the scikit-learn documentation for performing this task
+X = np.array(df.OriginalTweet_modified)
+y = np.array(df.Sentiment)
+
+X = vectorizer.fit_transform(X)
+
+# MultinomialNB
+nb = MultinomialNB()
+nb.fit(X, y)
+
+# Class predictions for X_train_tweet
+y_pred_class = nb.predict(X)
+
+# Calculate accuracy of class predictions
+accuracy = metrics.accuracy_score(y, y_pred_class)
+print(accuracy)
+
+
