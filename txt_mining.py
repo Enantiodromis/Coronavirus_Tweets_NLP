@@ -91,7 +91,7 @@ plt.tick_params(axis='x', which='major', labelsize=8)
 plt.title('Word Frequencies (entire dataset)')
 plt.xlabel('Words (word index)')
 plt.ylabel('Frequencies (fraction of documents in which the word appears)')
-plt.savefig('word_frequency.png')
+plt.savefig('graphs/word_frequency.png')
 
 plt.figure(figsize=(10,6))
 plt.plot(ordered_words_100,ordered_frequencies_100)
@@ -100,7 +100,7 @@ plt.tick_params(axis='x', which='major', labelsize=6)
 plt.title('Word Frequencies (top 100 word frequencies)')
 plt.xlabel('Words')
 plt.ylabel('Frequencies (fraction of documents in which the word appears)')
-plt.savefig('word_frequency_100.png')
+plt.savefig('graphs/word_frequency_100.png')
 
 # 1.4
 # This task can be done individually from the previous three. 
