@@ -13,7 +13,6 @@ import skimage.transform as transform
 from scipy.ndimage import gaussian_filter
 from scipy.ndimage import uniform_filter
 from scipy.ndimage import rotate
-from prettytable import PrettyTable
 
 # Reading in images:
 avengers = imageio.imread('data/image_data/avengers_imdb.jpg')
@@ -28,15 +27,8 @@ rolland = imageio.imread('data/image_data/rolland_garros_tv5monde.jpg')
 # Determining the size of the avengers_imdb.jpg image
 avengers_shape = avengers.shape
 
-#####################
-# Formatting output #
-#####################
-table_1 = PrettyTable()
-table_1.title = 'Image Mining 1.1'
-table_1.field_names = ["Question", "Findings"]
-table_1.add_row(['Size of avengers_imdb.jpg:',  avengers_shape])
-table_1.align = "l"
-print(table_1)
+print("QUESTION 2.1 FINDINGS:")
+print("The size of the avengers_imdb.jpg image: " + str(avengers_shape))
 
 # Creating a figure and subplots for image output formatting
 plt.figure(figsize=(10,5))

@@ -9,7 +9,6 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset, InsetP
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-from prettytable import PrettyTable
 
 # Reading in the text_data csv file as a df (vectorised)
 df = pd.read_csv('data/text_data/Corona_NLP_train.csv')
@@ -17,21 +16,21 @@ df = pd.read_csv('data/text_data/Corona_NLP_train.csv')
 ################
 # Question 1.1 #
 ################
-
+print("QUESTION 1.1 FINDINGS:")
 # Computing the possible sentiment values
 unique_sentiment_values = df.Sentiment.unique()
-#print(unique_sentiment_values)
+print("Possible sentiments of a tweet: " + str(unique_sentiment_values))
 
 # Computing the second most popular sentiment in the tweets  
 sentiment_values_count =  df.Sentiment.value_counts()
 second_popular_sentiment = list(sentiment_values_count.items())[1][0]
-#print("The second most popular sentiment in the tweets is: " + second_popular_sentiment)
+print("The second most popular sentiment in the tweets: " + second_popular_sentiment)
 
 # Retrieving the date with the greatest number of extremely positive tweets
 max_ep_tweets_date = df[df.Sentiment == 'Extremely Positive']
 max_ep_tweets_date_list = max_ep_tweets_date.groupby('TweetAt')['Sentiment'].value_counts().sort_values(ascending=False).reset_index(name = 'Counts')
 date_of_max_ep_tweets = max_ep_tweets_date_list['TweetAt'].iloc[0]
-#print("Date of the max amount of extremely positive: " + date_of_max_ep_tweets)
+print("Date of the greatest amount of extremely positive tweets: " + date_of_max_ep_tweets)
 
 # Converting the messages to lower case replace non-alphabetic characters with whitespaces and ensuring that the words of a message are seperated by a single whitespace
 df['OriginalTweet_modified'] = df.OriginalTweet.str.lower()\
@@ -42,7 +41,7 @@ df['OriginalTweet_modified'] = df.OriginalTweet.str.lower()\
 ################
 # Question 1.2 #
 ################
-
+print("QUESTION 1.2 FINDINGS:")
 # Tokenizing the tweets (i.e. convert each into a list of words) frequency of every word in the corpus
 token_count = df.OriginalTweet_modified.str.split(expand = True).stack().value_counts()
 
@@ -51,9 +50,12 @@ def word_count(input_series):
     all_total, distinct_total = str(sum(input_series)), str(len(input_series))
     return all_total, distinct_total
 all_words, distinct_words = word_count(token_count)
+print("Total number of all words (Including repetition): " + all_words)
+print("Total number of all distinct words: " + distinct_words)
 
 # Retrieving the top ten most frequently used words
 top_ten = [word for word in token_count[:10].keys()]
+print("10 most frequent words in the corpus: " +  str(top_ten))
 
 # Removing stop words, words with ≤ 2 characters and recalculating the number of all words (including repetitions) and the 10 most frequent words in the modified corpus.
 df.OriginalTweet_modified = df.OriginalTweet_modified.apply(lambda x: [item for item in x.split() if item not in ENGLISH_STOP_WORDS and len(item) > 2]).apply(lambda x: ' '.join(x))
@@ -61,9 +63,11 @@ df.OriginalTweet_modified = df.OriginalTweet_modified.apply(lambda x: [item for 
 # Frequency of every word in the corpus after stop words and words with ≤ 2 characters have been removed
 token_count_after = df.OriginalTweet_modified.str.split(expand = True).stack().value_counts()
 all_words_after, distinct_words_after = word_count(token_count_after)
+print("Total number of all words (including repetitions) (After stop words and words with <= 2 characters have been removed): " +  all_words_after)
 
 # Retrieving the top ten most frequently used words
 top_ten_after = [word for word in token_count_after[:10].keys()]
+print("10 most frequent words in the corpus (After stop words and words with ≤ 2 characters have been removed): " +  str(top_ten_after))
 
 ################
 # Question 1.3 #
@@ -113,7 +117,7 @@ plt.savefig('outputs/word_frequency_100.png')
 ################
 # Question 1.4 #
 ################
-
+print("QUESTION 1.4 FINDINGS:")
 # Producing a Multinomial Naive Bayes classiﬁer for the Coronavirus Tweets NLP data set using scikit-learn. 
 X = np.array(df.OriginalTweet_modified)
 y = np.array(df.Sentiment)
@@ -130,38 +134,4 @@ y_pred_class = nb.predict(X)
 # Calculate accuracy and error rate of class predictions
 accuracy = metrics.accuracy_score(y, y_pred_class)
 error_rate = str(round((1 - accuracy) * 100,2)) + "%"
-
-
-#######################################
-# FORMATTING OUTPUT USING PRETTYTABLE #
-#######################################
-
-# OUTPUT FOR 1.1
-table_1 = PrettyTable()
-table_1.title = 'Text Mining 1.1'
-table_1.field_names = ["Question", "Findings"]
-table_1.add_row(['Possible sentiments of a tweet: ', unique_sentiment_values])
-table_1.add_row(['Second most popular sentiment: ', second_popular_sentiment])
-table_1.add_row(['Date with greatest extremely positive tweets: ', date_of_max_ep_tweets])
-table_1.align = "l"
-print(table_1)
-
-# OUTPUT FOR 1.2
-table_2 = PrettyTable()
-table_2.title = 'Text Mining 1.2'
-table_2.field_names = ["Question", "Findings"]
-table_2.add_row(['Total number of all words (including repetitions):',  all_words])
-table_2.add_row(['Total number of all distinct words:',  distinct_words])
-table_2.add_row(['10 most frequent words in the corpus:', top_ten])
-table_2.add_row(['Total number of all words (including repetitions) (After stop words and words with <= 2 characters have been removed):',  all_words_after])
-table_2.add_row(['10 most frequent words in the corpus (After stop words and words with <= 2 characters have been removed):', top_ten_after])
-table_2.align = "l"
-print(table_2)
-
-# OUTPUT FOR 1.4
-table_3 = PrettyTable()
-table_3.title = 'Text Mining 1.3'
-table_3.field_names = ["Question", "Findings"]
-table_3.add_row(["Multinomial Naive Bayes classifier error rate:", error_rate])
-table_2.align = "l"
-print(table_3)
+print("Multinomial Naive Bayes classifier error rate: " +  error_rate)
