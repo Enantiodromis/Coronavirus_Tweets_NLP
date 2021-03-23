@@ -1,14 +1,18 @@
+# AUTHOR: George Bradley
+# Version: FINAL
+
 # IMPORTS
 import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
-from matplotlib.axis import Axis 
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset, InsetPosition
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.model_selection import train_test_split
 from sklearn import metrics
+import time
+
+# starting time
+start = time.time()
 
 # Reading in the text_data csv file as a df (vectorised)
 df = pd.read_csv('data/text_data/Corona_NLP_train.csv')
@@ -135,3 +139,9 @@ y_pred_class = nb.predict(X)
 accuracy = metrics.accuracy_score(y, y_pred_class)
 error_rate = str(round((1 - accuracy) * 100,2)) + "%"
 print("Multinomial Naive Bayes classifier error rate: " +  error_rate)
+
+# end time
+end = time.time()
+
+# total time taken
+print(f"Runtime of the program is {round(end - start, 2)}")

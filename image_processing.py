@@ -1,3 +1,6 @@
+# AUTHOR: George Bradley
+# Version: FINAL
+
 # IMPORTS
 import numpy as np
 import imageio
@@ -147,3 +150,4 @@ for line in lines:
     p0, p1 = line
     plt.plot((p0[0], p1[0]), (p0[1], p1[1]))
 plt.savefig('outputs/rolland_all.jpg')
+
